@@ -1,5 +1,7 @@
 <?php
 
+session_start();
+
 if ( isset($_POST['cancel'] ) ) {
 
     header("Location: index.php");
@@ -10,17 +12,21 @@ $salt = 'XyZzy12*_';
 $stored_hash = '1a52e17fa899cf40fb04cfc42e6352f1';  
 $failure = false;  
 
-if ( isset($_POST['who']) && isset($_POST['pass']) ) {
+if ( isset($_POST['email']) && isset($_POST['pass']) ) {
 
-    if ( strlen($_POST['who']) < 1 || strlen($_POST['pass']) < 1 ) {
+    if ( strlen($_POST['email']) < 1 || strlen($_POST['pass']) < 1 ) {
 
-        $failure = "User name and password are required";
+        $_SESSION['error'] = "User name and password are required";
+        header("Location: login.php");
+        return;
 
     } else {
 
-        if (!strpos($_POST['who'], '@')) {
+        if (!strpos($_POST['email'], '@')) {
 
-            $failure = "Email must have an at-sign (@)";
+            $_SESSION['error'] = "Email must have an at-sign (@)";
+            header("Location: login.php");
+            return;
 
         } else {
 
@@ -28,14 +34,17 @@ if ( isset($_POST['who']) && isset($_POST['pass']) ) {
 
             if ( $check == $stored_hash ) {
 
-                error_log("Login success ".$_POST['who']);
-                header("Location: autos.php?name=".urlencode($_POST['who']));
+                error_log("Login success ".$_POST['email']);
+                /*header("Location: add.php?name=".urlencode($_POST['email']));*/
+                $_SESSION['name'] = $_POST['email'];
+                header("Location: view.php");
                 return;
 
             } else {
 
-                error_log("Login fail ".$_POST['who']." $check");
-                $failure = "Incorrect password";
+                $_SESSION['error'] = "Incorrect password";
+                header("Location: login.php");
+                return;
             }
         }      
     }
@@ -47,7 +56,7 @@ if ( isset($_POST['who']) && isset($_POST['pass']) ) {
 <html>
     <head>
     <?php require_once "bootstrap.php"; ?>
-    <title>Daniel Arias Cámara Login Page 73292a3f</title>
+    <title>Daniel Arias Cámara Login Page 8364f022</title>
     </head>
 
     <body>
@@ -56,16 +65,18 @@ if ( isset($_POST['who']) && isset($_POST['pass']) ) {
 
             <?php
 
-                if ( $failure !== false ) {
+                if ( isset($_SESSION['error']) ) {
 
-                    echo('<p style="color: red;">'.htmlentities($failure)."</p>\n");
+                    echo('<p style="color: red;">'.htmlentities($_SESSION['error'])."</p>\n");
+                    unset($_SESSION['error']);
 
                 }
+
             ?>
 
         <form method="POST">
-            <label for="nam">User Name</label>
-            <input type="text" name="who" id="nam"><br/>
+            <label for="nam">Email</label>
+            <input type="text" name="email" id="nam"><br/>
             <label for="id_1723">Password</label>
             <input type="text" name="pass" id="id_1723"><br/>
             <input type="submit" value="Log In">

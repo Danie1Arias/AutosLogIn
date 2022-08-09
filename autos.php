@@ -93,16 +93,21 @@ if ( isset($_POST['make']) && isset($_POST['year']) && isset($_POST['mileage']) 
     <ul>
         <?php
 
-            $stmt = $pdo->query("SELECT make, year, mileage FROM autos");
-            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $statement = $pdo->query("SELECT car_id, make, year, mileage FROM cars");
 
-            foreach ( $rows as $row ) {
-
-                echo("<li>" . $row['year'] . " ");
-                echo($row['make'] . " / ");
-                echo($row['mileage']. "</li>");
-
-            } 
+                while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+                echo "<table border='1'>"."\n";
+                echo "<tr><td>";
+                echo $row['car_id'];
+                echo '</td><td>';
+                echo htmlentities ($row['make']);
+                echo "</td><td>";
+                echo $row['year'];
+                echo "</td><td>";
+                echo $row['mileage'];
+                echo "</td></tr>";
+                }
+        echo "</table>\n";
 
         ?>
     </ul>
